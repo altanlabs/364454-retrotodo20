@@ -1,40 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@altanlabs/auth';
+import { useDatabase } from '@altanlabs/database';
+import { useToast } from '@/hooks/use-toast';
 
 interface Todo {
   id: string;
-  title: string;
-  completed: boolean;
+  fields: {
+    title: string;
+    completed: boolean;
+    user_id: string[];
+  };
 }
 
 export function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState('');
   const { user } = useAuth();
+  const { toast } = useToast();
+  const {
+    records: todos,
+    addRecord,
+    modifyRecord,
+    removeRecord,
+    refresh
+  } = useDatabase('todos');
 
-  const addTodo = () => {
-    if (!newTodo.trim()) return;
-    const todo: Todo = {
-      id: Date.now().toString(),
-      title: newTodo,
-      completed: false,
-    };
-    setTodos([...todos, todo]);
-    setNewTodo('');
+  useEffect(() => {
+    if (user) {
+      refresh({
+        filters: [{ field: 'user_id', operator: 'eq', value: user.id }],
+        sort: [{ field: 'created_at', direction: 'desc' }]
+      });
+    }
+  }, [user]);
+
+  const addTodo = async () => {
+    if (!newTodo.trim() || !user) return;
+    try {
+      await addRecord({
+        title: newTodo,
+        completed: false,
+        user_id: [user.id]
+      });
+      setNewTodo('');
+      toast({
+        title: 'Todo added',
+        description: 'Your new todo has been created.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to add todo.',
+        variant: 'destructive'
+      });
+    }
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+  const toggleTodo = async (todo: Todo) => {
+    try {
+      await modifyRecord(todo.id, {
+        completed: !todo.fields.completed
+      });
+      toast({
+        title: 'Todo updated',
+        description: todo.fields.completed ? 'Todo marked as incomplete.' : 'Todo marked as complete.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update todo.',
+        variant: 'destructive'
+      });
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const deleteTodo = async (id: string) => {
+    try {
+      await removeRecord(id);
+      toast({
+        title: 'Todo deleted',
+        description: 'Your todo has been removed.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete todo.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -58,19 +114,19 @@ export function TodoList() {
         </div>
         
         <div className="space-y-2">
-          {todos.map((todo) => (
+          {todos.map((todo: Todo) => (
             <div
               key={todo.id}
               className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 border-2 border-black"
             >
               <div className="flex items-center gap-2">
                 <Checkbox
-                  checked={todo.completed}
-                  onCheckedChange={() => toggleTodo(todo.id)}
+                  checked={todo.fields.completed}
+                  onCheckedChange={() => toggleTodo(todo)}
                   className="border-2 border-black"
                 />
-                <span className={todo.completed ? 'line-through' : ''}>
-                  {todo.title}
+                <span className={todo.fields.completed ? 'line-through' : ''}>
+                  {todo.fields.title}
                 </span>
               </div>
               <Button
