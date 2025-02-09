@@ -1,104 +1,42 @@
-import * as React from "react"
-import type { ToastProps } from "@/types/toast"
-
-const TOAST_LIMIT = 1
-
-interface State {
-  toasts: ToastProps[]
-}
-
-export const reducer = (state: State, action: { type: string, toast?: ToastProps, toastId?: string }) => {
-  switch (action.type) {
-    case "ADD_TOAST":
-      return {
-        ...state,
-        toasts: [action.toast!, ...state.toasts].slice(0, TOAST_LIMIT),
-      }
-    case "UPDATE_TOAST":
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast!.id ? { ...t, ...action.toast } : t
-        ),
-      }
-    case "DISMISS_TOAST": {
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toastId || action.toastId === undefined
-            ? { ...t, open: false }
-            : t
-        ),
-      }
-    }
-    case "REMOVE_TOAST":
-      if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        }
-      }
-      return {
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
-      }
-    default:
-      return state
-  }
-}
-
-const listeners: Array<(state: State) => void> = []
-
-let memoryState: State = { toasts: [] }
-
-function dispatch(action: { type: string, toast?: ToastProps, toastId?: string }) {
-  memoryState = reducer(memoryState, action)
-  listeners.forEach((listener) => {
-    listener(memoryState)
-  })
-}
-
-export function toast({ ...props }: Omit<ToastProps, "id">) {
-  const id = Math.random().toString(36).substr(2, 9)
-  const update = (props: ToastProps) =>
-    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open: boolean) => {
-        if (!open) dismiss()
-      },
-    },
-  })
-
-  return {
-    id,
-    dismiss,
-    update,
-  }
+interface ToastOptions {
+  title: string;
+  description?: string;
+  variant?: 'default' | 'destructive';
 }
 
 export function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
-
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
+  const toast = (options: ToastOptions) => {
+    const toastElement = document.createElement('div');
+    toastElement.className = `fixed bottom-4 right-4 p-4 rounded border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-mono text-sm
+      ${options.variant === 'destructive' 
+        ? 'bg-red-500 text-white' 
+        : 'bg-white dark:bg-gray-800 text-black dark:text-white'}`;
+    
+    const titleElement = document.createElement('div');
+    titleElement.className = 'font-bold mb-1';
+    titleElement.textContent = options.title;
+    
+    toastElement.appendChild(titleElement);
+    
+    if (options.description) {
+      const descElement = document.createElement('div');
+      descElement.className = 'text-sm opacity-90';
+      descElement.textContent = options.description;
+      toastElement.appendChild(descElement);
     }
-  }, [state])
+    
+    document.body.appendChild(toastElement);
+    
+    setTimeout(() => {
+      toastElement.style.opacity = '0';
+      toastElement.style.transform = 'translateX(100%)';
+      toastElement.style.transition = 'all 0.3s ease-out';
+      
+      setTimeout(() => {
+        document.body.removeChild(toastElement);
+      }, 300);
+    }, 3000);
+  };
 
-  return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  }
+  return { toast };
 }
