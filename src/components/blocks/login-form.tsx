@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@altanlabs/auth';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../hooks/use-toast';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -15,20 +15,20 @@ export function LoginForm() {
       if (isRegistering) {
         await register({ email, password });
         toast({
-          title: '🎮 Player Created!',
-          description: 'Ready Player One!'
+          title: '🎮 NEW PLAYER',
+          description: 'PLAYER CREATED!'
         });
       } else {
         await login({ email, password });
         toast({
-          title: '🕹️ Game On!',
-          description: 'Welcome back, player!'
+          title: '🕹️ READY!',
+          description: 'PLAYER 1 START!'
         });
       }
     } catch (error) {
       toast({
-        title: '❌ Game Over',
-        description: isRegistering ? 'Failed to create player.' : 'Invalid credentials.',
+        title: '❌ GAME OVER',
+        description: isRegistering ? 'CREATION FAILED' : 'LOGIN FAILED',
         variant: 'destructive'
       });
     }
@@ -42,7 +42,7 @@ export function LoginForm() {
           placeholder="EMAIL"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full font-mono text-sm"
+          className="w-full font-['Press_Start_2P'] text-xs"
           required
         />
       </div>
@@ -52,22 +52,22 @@ export function LoginForm() {
           placeholder="PASSWORD"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full font-mono text-sm"
+          className="w-full font-['Press_Start_2P'] text-xs"
           required
         />
       </div>
       <button
         type="submit"
-        className="w-full py-3 bg-black text-white font-mono text-sm border-2 border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]"
+        className="w-full py-3 bg-black text-white font-['Press_Start_2P'] text-xs border-2 border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]"
       >
-        {isRegistering ? 'CREATE PLAYER' : 'START GAME'}
+        {isRegistering ? 'CREATE PLAYER' : 'PRESS START'}
       </button>
       <button
         type="button"
         onClick={() => setIsRegistering(!isRegistering)}
-        className="w-full mt-2 py-2 font-mono text-sm text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
+        className="w-full mt-2 py-2 font-['Press_Start_2P'] text-xs text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
       >
-        {isRegistering ? '← BACK TO LOGIN' : 'NEW PLAYER? →'}
+        {isRegistering ? '← BACK' : 'NEW GAME →'}
       </button>
     </form>
   );
