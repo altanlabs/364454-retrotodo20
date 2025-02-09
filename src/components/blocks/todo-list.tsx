@@ -1,8 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@altanlabs/auth';
 import { useDatabase } from '@altanlabs/database';
 import { useToast } from '@/hooks/use-toast';
@@ -47,13 +43,13 @@ export function TodoList() {
       });
       setNewTodo('');
       toast({
-        title: 'Todo added',
-        description: 'Your new todo has been created.'
+        title: '🎮 Level Up!',
+        description: 'New quest added to your list!'
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to add todo.',
+        title: '❌ Game Over',
+        description: 'Failed to add quest.',
         variant: 'destructive'
       });
     }
@@ -65,13 +61,13 @@ export function TodoList() {
         completed: !todo.fields.completed
       });
       toast({
-        title: 'Todo updated',
-        description: todo.fields.completed ? 'Todo marked as incomplete.' : 'Todo marked as complete.'
+        title: todo.fields.completed ? '↩️ Quest Reset' : '✨ Quest Complete!',
+        description: todo.fields.completed ? 'Back to the grind!' : 'Achievement unlocked!'
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to update todo.',
+        title: '❌ Error',
+        description: 'Quest status update failed.',
         variant: 'destructive'
       });
     }
@@ -81,65 +77,65 @@ export function TodoList() {
     try {
       await removeRecord(id);
       toast({
-        title: 'Todo deleted',
-        description: 'Your todo has been removed.'
+        title: '💥 Quest Abandoned',
+        description: 'Maybe next time!'
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to delete todo.',
+        title: '❌ Error',
+        description: 'Failed to abandon quest.',
         variant: 'destructive'
       });
     }
   };
 
   return (
-    <Card className="w-full max-w-md p-6 bg-[#f0f0f0] dark:bg-[#2a2a2a] border-4 border-[#000000] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <div className="bg-white dark:bg-gray-800 border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="space-y-4">
         <div className="flex gap-2">
-          <Input
+          <input
             type="text"
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="Add a new todo..."
-            className="retro-input border-2 border-black bg-white dark:bg-gray-800"
+            placeholder="NEW QUEST..."
+            className="flex-1 font-mono text-sm"
             onKeyPress={(e) => e.key === 'Enter' && addTodo()}
           />
-          <Button
+          <button
             onClick={addTodo}
-            className="bg-[#000000] text-white hover:bg-[#333333] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            className="px-4 py-2 bg-black text-white font-mono text-sm border-2 border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]"
           >
-            Add
-          </Button>
+            ADD
+          </button>
         </div>
         
         <div className="space-y-2">
           {todos.map((todo: Todo) => (
             <div
               key={todo.id}
-              className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 border-2 border-black"
+              className="flex items-center justify-between p-3 bg-[#f0f0f0] dark:bg-gray-700 border-2 border-black"
             >
-              <div className="flex items-center gap-2">
-                <Checkbox
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
                   checked={todo.fields.completed}
-                  onCheckedChange={() => toggleTodo(todo)}
-                  className="border-2 border-black"
+                  onChange={() => toggleTodo(todo)}
+                  className="w-4 h-4 border-2 border-black"
                 />
-                <span className={todo.fields.completed ? 'line-through' : ''}>
+                <span className={`font-mono text-sm ${todo.fields.completed ? 'line-through text-gray-500' : ''}`}>
                   {todo.fields.title}
                 </span>
               </div>
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => deleteTodo(todo.id)}
-                className="h-8 px-2 text-red-500 hover:text-red-700"
+                className="px-2 font-mono text-red-500 hover:text-red-700"
               >
                 ×
-              </Button>
+              </button>
             </div>
           ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
