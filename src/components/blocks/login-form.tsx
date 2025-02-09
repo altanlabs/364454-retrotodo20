@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '@altanlabs/auth';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 export function LoginForm() {
@@ -17,20 +15,20 @@ export function LoginForm() {
       if (isRegistering) {
         await register({ email, password });
         toast({
-          title: 'Registration successful',
-          description: 'Your account has been created.'
+          title: '🎮 Player Created!',
+          description: 'Ready Player One!'
         });
       } else {
         await login({ email, password });
         toast({
-          title: 'Login successful',
-          description: 'Welcome back!'
+          title: '🕹️ Game On!',
+          description: 'Welcome back, player!'
         });
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: isRegistering ? 'Registration failed.' : 'Login failed.',
+        title: '❌ Game Over',
+        description: isRegistering ? 'Failed to create player.' : 'Invalid credentials.',
         variant: 'destructive'
       });
     }
@@ -39,39 +37,38 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Input
+        <input
           type="email"
-          placeholder="Email"
+          placeholder="EMAIL"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border-2 border-black bg-white dark:bg-gray-800"
+          className="w-full font-mono text-sm"
           required
         />
       </div>
       <div className="space-y-2">
-        <Input
+        <input
           type="password"
-          placeholder="Password"
+          placeholder="PASSWORD"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border-2 border-black bg-white dark:bg-gray-800"
+          className="w-full font-mono text-sm"
           required
         />
       </div>
-      <Button
+      <button
         type="submit"
-        className="w-full bg-black text-white hover:bg-gray-800 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+        className="w-full py-3 bg-black text-white font-mono text-sm border-2 border-black hover:bg-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]"
       >
-        {isRegistering ? 'Register' : 'Login'}
-      </Button>
-      <Button
+        {isRegistering ? 'CREATE PLAYER' : 'START GAME'}
+      </button>
+      <button
         type="button"
-        variant="ghost"
         onClick={() => setIsRegistering(!isRegistering)}
-        className="w-full mt-2"
+        className="w-full mt-2 py-2 font-mono text-sm text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
       >
-        {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
-      </Button>
+        {isRegistering ? '← BACK TO LOGIN' : 'NEW PLAYER? →'}
+      </button>
     </form>
   );
 }
