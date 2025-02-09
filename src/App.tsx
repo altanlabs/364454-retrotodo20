@@ -1,7 +1,6 @@
 import { DatabaseProvider } from '@altanlabs/database';
 import { AuthProvider } from '@altanlabs/auth';
-import { ThemeProvider } from '@/theme/theme-provider';
-import { Toaster } from '@/components/ui/toaster';
+import { ThemeProvider } from './theme/theme-provider';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './layout';
 import IndexPage from './pages/index';
@@ -26,7 +25,6 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
-          <Toaster />
         </ThemeProvider>
       </AuthProvider>
     </DatabaseProvider>
