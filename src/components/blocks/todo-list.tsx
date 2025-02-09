@@ -17,11 +17,12 @@ export function TodoList() {
   const { user } = useAuth();
   const { toast } = useToast();
   const {
-    records: todos,
+    records: todos = [], // Provide default empty array
     addRecord,
     modifyRecord,
     removeRecord,
-    refresh
+    refresh,
+    isLoading
   } = useDatabase('todos');
 
   useEffect(() => {
@@ -110,30 +111,40 @@ export function TodoList() {
         </div>
         
         <div className="space-y-2">
-          {todos.map((todo: Todo) => (
-            <div
-              key={todo.id}
-              className="flex items-center justify-between p-3 bg-[#f0f0f0] dark:bg-gray-700 border-2 border-black"
-            >
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={todo.fields.completed}
-                  onChange={() => toggleTodo(todo)}
-                  className="w-4 h-4 border-2 border-black cursor-pointer"
-                />
-                <span className={`font-['Press_Start_2P'] text-xs ${todo.fields.completed ? 'line-through text-gray-500' : ''}`}>
-                  {todo.fields.title}
-                </span>
-              </div>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="px-2 font-['Press_Start_2P'] text-red-500 hover:text-red-700"
-              >
-                ×
-              </button>
+          {isLoading ? (
+            <div className="text-center font-['Press_Start_2P'] text-xs py-4">
+              LOADING...
             </div>
-          ))}
+          ) : todos.length === 0 ? (
+            <div className="text-center font-['Press_Start_2P'] text-xs py-4">
+              NO QUESTS YET
+            </div>
+          ) : (
+            todos.map((todo: Todo) => (
+              <div
+                key={todo.id}
+                className="flex items-center justify-between p-3 bg-[#f0f0f0] dark:bg-gray-700 border-2 border-black"
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={todo.fields.completed}
+                    onChange={() => toggleTodo(todo)}
+                    className="w-4 h-4 border-2 border-black cursor-pointer"
+                  />
+                  <span className={`font-['Press_Start_2P'] text-xs ${todo.fields.completed ? 'line-through text-gray-500' : ''}`}>
+                    {todo.fields.title}
+                  </span>
+                </div>
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="px-2 font-['Press_Start_2P'] text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
